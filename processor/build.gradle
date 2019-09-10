@@ -39,12 +39,12 @@ modifyPom {
     project {
         name 'C-Crit-generator'
         description 'C-Keyfile-Generator for Android'
-        url ''
+        url 'https://github.com/Foso/C-Crit_Generator'
         inceptionYear '2019'
         scm {
-            url ''
-            connection 'scm:https://github.com/Foso/'
-            developerConnection 'scm:git://github.com/Foso/'
+            url 'https://github.com/Foso/C-Crit_Generator'
+            connection 'scm:https://github.com/Foso/C-Crit_Generator.git'
+            developerConnection 'scm:git://github.com/Foso/C-Crit_Generator.git'
         }
         licenses {
             license {
