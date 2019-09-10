@@ -11,7 +11,9 @@
 
 
 ## Introduction 🙋‍♂️ 🙋‍
-You want to store your critical secret keys in a C file, but you don't y
+You want to store your critical secret keys in your Android App in a C file, but you don't want to deal with C?
+Let C-Crit Generator generate your C Keys file.
+
 
 
 ### Show some :heart: and star the repo to support the project
