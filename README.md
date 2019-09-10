@@ -70,7 +70,7 @@ Now the processor will generated the C-Code for all your annotated functions int
 JNIEXPORT jstring JNICALL
 Java_de_jensklingenberg_myapplication_KeysModule_getPassword(JNIEnv *env, jobject instance) {
 
-return (*env)->  NewStringUTF(env, "passi");
+return (*env)->  NewStringUTF(env, "mySecretKey12");
 }
 
 ```
@@ -82,6 +82,7 @@ Feel free to send feedback on [Twitter](https://twitter.com/jklingenberg_) or [f
  	
 * <kbd>processor</kbd> - the module that contains the code for the annotation processor
 * <kbd>example</kbd> - A Kotlin Jvm project which uses the processor
+* <kbd>CcritDemoProject</kbd> - A Android Demo Project that uses native code and the Ccrit Generator
 
 
 
