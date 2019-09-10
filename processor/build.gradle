@@ -1,0 +1,79 @@
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'signing'
+    id 'maven-publish'
+    id 'io.codearte.nexus-staging' version '0.21.0'
+
+}
+
+apply plugin: 'kotlin-kapt'
+apply plugin: "maven"
+apply plugin: 'com.bmuschko.nexus'
+
+
+
+group = "de.jensklingenberg"
+archivesBaseName = "ccrit-generator"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+}
+
+
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = archivesBaseName
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "com.google.auto.service:auto-service:1.0-rc6"
+    kapt "com.google.auto.service:auto-service:1.0-rc6"
+}
+
+
+modifyPom {
+    project {
+        name 'C-Crit-generator'
+        description 'C-Keyfile-Generator for Android'
+        url ''
+        inceptionYear '2019'
+        scm {
+            url ''
+            connection 'scm:https://github.com/Foso/'
+            developerConnection 'scm:git://github.com/Foso/'
+        }
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        developers {
+            developer {
+                id 'Foso'
+                name 'Jens Klingenberg'
+                email 'mail@jensklingenberg.de'
+            }
+        }
+    }
+}
+extraArchive {
+    sources = true
+    tests = true
+    javadoc = true
+}
+nexus {
+    sign = false//true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+}
+
+nexusStaging {
+    packageGroup = "de.jensklingenberg" //optional if packageGroup == project.getGroup()
+    stagingProfileId = "d56228753311b0" //when not defined will be got from server using "packageGroup"
+}
