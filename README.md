@@ -42,6 +42,17 @@ dependencies {
 }
 ```
 Configure the processor in your build.gradle
+Add the javaCompileOptions inside <strong> android{} </strong>, like here https://github.com/Foso/C-Crit_Generator/blob/master/CcritDemoProject/app/build.gradle
+
+```kotlin
+ javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
+        }
+```
+
+Add the kapt options:
 
 ```kotlin
 
