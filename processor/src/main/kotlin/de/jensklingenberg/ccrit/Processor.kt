@@ -29,6 +29,22 @@ class CcritProcessor : AbstractProcessor() {
                     |  
                     |""".trimMargin()
 
+    val packageNameCFunc = """
+        |
+        |static jstring get_package_name(JNIEnv *env, jobject jActivity) {
+        |    jclass jActivity_class = env->GetObjectClass(jActivity);
+        |
+        |    jmethodID jMethod_id_pn = env->GetMethodID(jActivity_class, "getPackageName", "()Ljava/lang/String;");
+        |    jstring package_name = (jstring) env->CallObjectMethod(jActivity, jMethod_id_pn);
+        |
+        |    __android_log_print(ANDROID_LOG_DEBUG, TAG, "package name: %s\n", package_name);
+        |    printf("package name: %s\n", package_name);
+        |    return package_name;
+        |}
+        |
+        |
+    """.trimMargin()
+
     fun getCFunction(secret: String, functionName: String): String {
         return """
                     |JNIEXPORT jstring JNICALL
@@ -50,6 +66,7 @@ class CcritProcessor : AbstractProcessor() {
 
             val stringBuilder = StringBuilder()
             stringBuilder.append(header)
+            stringBuilder.append(packageNameCFunc)
 
             annotatedFunctionsList.forEach { function ->
                 val packageName = processingEnv.elementUtils.getPackageOf(function).toString()
@@ -59,7 +76,8 @@ class CcritProcessor : AbstractProcessor() {
                         "_"
                     )
                 val secret = function.getAnnotation(NativeSecret::class.java).secret
-                stringBuilder.append(getCFunction(secret, functionNameWithPackageAndUnderScores))
+                val encodedSecret = encode(secret, processingEnv.options["package"] ?: "package")
+                stringBuilder.append(getCFunction(encodedSecret, functionNameWithPackageAndUnderScores))
             }
 
             val outputFilePath =
@@ -70,6 +88,12 @@ class CcritProcessor : AbstractProcessor() {
             }.writeText(stringBuilder.toString())
         }
         return true
+    }
+
+    private fun encode(text: String, key: String): String {
+        val result = java.lang.StringBuilder()
+        for (c in text.indices) result.append((text[c].toInt() xor key[c % key.length].toInt()).toChar())
+        return result.toString()
     }
 }
 

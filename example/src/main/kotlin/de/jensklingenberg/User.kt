@@ -13,7 +13,7 @@ data class User(
     external fun getSecretString()
 
     @NativeSecret("topServe32dss")
-    fun getSecondSecret() {
+    fun getSecondSecretXXX() {
 
     }
 }

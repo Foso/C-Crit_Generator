@@ -15,7 +15,7 @@ apply plugin: 'com.bmuschko.nexus'
 
 group = "de.jensklingenberg"
 archivesBaseName = "ccrit-generator"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
