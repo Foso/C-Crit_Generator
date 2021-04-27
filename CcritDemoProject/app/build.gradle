@@ -43,7 +43,6 @@ android {
 kapt {
     arguments {
         arg("ccrit", "src/main/cpp/keys.c")
-        arg("package", "de.jensklingenberg.ccritdemoproject")
     }
 }
 
