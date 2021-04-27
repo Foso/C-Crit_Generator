@@ -19,61 +19,40 @@ class CcritProcessor : AbstractProcessor() {
 
     private var annotatedFunctionsList: ArrayList<Element> = arrayListOf()
 
-    override fun getSupportedAnnotationTypes(): MutableSet<String> = mutableSetOf(NativeSecret::class.java.name)
+    override fun getSupportedAnnotationTypes(): MutableSet<String> =
+        mutableSetOf(NativeSecret::class.java.name)
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latest()
 
     private val header = """
                     |#include <jni.h>
                     |#include <string.h>
-                    |#include <unistd.h>
-                    |#include <stdio.h>
                     |  
                     |""".trimMargin()
 
     private val modifyCFunc = """
         |
-        |char* mod(char* input, int length) {
-        |    pid_t pid = getpid();
-        |    char path[64] = {0};
-        |    sprintf(path, "/proc/%d/cmdline", pid);
-        |    FILE *cmdline = fopen(path, "r");
-        |    char id[64] = {0};
-        |    if (cmdline) {
-        |        fread(id, sizeof(id), 1, cmdline);
-        |        fclose(cmdline);
-        |    }
-        |    for (int i = 0; i < length-1; i++)
-        |    {
-        |        input[i] = input[i] ^ id[i % strlen(id)];
-        |    }
+        |char* mod(char* input, int length, char* mod) {
+        |    for (int i = 0; i < length-1; i++) input[i] = input[i] ^ mod[i % strlen(mod)];
         |    return input;
         |}
         |
     """.trimMargin()
 
-    fun getCFunction(secret: String, length: Int, functionName: String): String {
+    private fun getCFunction(
+        secret: String,
+        length: Int,
+        functionName: String,
+        simpleName: String
+    ): String {
         return """
                     |JNIEXPORT jstring JNICALL
                     |Java_$functionName(JNIEnv *env, jobject instance) {
-                    |
-                    |$secret
-                    |return (*env)->  NewStringUTF(env, mod(enc, ${length + 1}));
+                    |   $secret
+                    |   return (*env)->  NewStringUTF(env, mod(enc, ${length + 1}, "$simpleName"));
                     |}
                     |
                     |""".trimMargin()
-    }
-
-    private fun toCharArray(input: String): String {
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("char enc[${input.length+1}] = {")
-        for (i in input.indices) {
-            val char = input[i]
-            stringBuilder.append(char.toInt())
-            if (i < input.length - 1) stringBuilder.append(", ")
-        }
-        stringBuilder.append(", '\\0'};")
-        return stringBuilder.toString()
     }
 
     override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
@@ -95,9 +74,18 @@ class CcritProcessor : AbstractProcessor() {
                         ".",
                         "_"
                     )
-                val secret = function.getAnnotation(NativeSecret::class.java).secret
-                val encodedSecret = encode(secret, processingEnv.options["package"] ?: "package")
-                stringBuilder.append(getCFunction(toCharArray(encodedSecret), secret.length, functionNameWithPackageAndUnderScores))
+                val secret = encode(
+                    function.getAnnotation(NativeSecret::class.java).secret,
+                    function.simpleName.toString()
+                )
+                stringBuilder.append(
+                    getCFunction(
+                        toCharArray(secret),
+                        secret.length,
+                        functionNameWithPackageAndUnderScores,
+                        function.simpleName.toString()
+                    )
+                )
             }
 
             val outputFilePath =
@@ -108,6 +96,18 @@ class CcritProcessor : AbstractProcessor() {
             }.writeText(stringBuilder.toString())
         }
         return true
+    }
+
+    private fun toCharArray(input: String): String {
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("char enc[${input.length + 1}] = {")
+        for (i in input.indices) {
+            val char = input[i]
+            stringBuilder.append(char.toInt())
+            if (i < input.length - 1) stringBuilder.append(", ")
+        }
+        stringBuilder.append(", '\\0'};")
+        return stringBuilder.toString()
     }
 
     private fun encode(text: String, key: String): String {
