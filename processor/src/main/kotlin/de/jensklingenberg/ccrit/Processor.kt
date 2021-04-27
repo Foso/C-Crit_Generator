@@ -23,37 +23,57 @@ class CcritProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latest()
 
-    val header = """
+    private val header = """
                     |#include <jni.h>
                     |#include <string.h>
+                    |#include <unistd.h>
+                    |#include <stdio.h>
                     |  
                     |""".trimMargin()
 
-    val packageNameCFunc = """
+    private val modifyCFunc = """
         |
-        |static jstring get_package_name(JNIEnv *env, jobject jActivity) {
-        |    jclass jActivity_class = env->GetObjectClass(jActivity);
-        |
-        |    jmethodID jMethod_id_pn = env->GetMethodID(jActivity_class, "getPackageName", "()Ljava/lang/String;");
-        |    jstring package_name = (jstring) env->CallObjectMethod(jActivity, jMethod_id_pn);
-        |
-        |    __android_log_print(ANDROID_LOG_DEBUG, TAG, "package name: %s\n", package_name);
-        |    printf("package name: %s\n", package_name);
-        |    return package_name;
+        |char* mod(char* input, int length) {
+        |    pid_t pid = getpid();
+        |    char path[64] = {0};
+        |    sprintf(path, "/proc/%d/cmdline", pid);
+        |    FILE *cmdline = fopen(path, "r");
+        |    char id[64] = {0};
+        |    if (cmdline) {
+        |        fread(id, sizeof(id), 1, cmdline);
+        |        fclose(cmdline);
+        |    }
+        |    for (int i = 0; i < length-1; i++)
+        |    {
+        |        input[i] = input[i] ^ id[i % strlen(id)];
+        |    }
+        |    return input;
         |}
-        |
         |
     """.trimMargin()
 
-    fun getCFunction(secret: String, functionName: String): String {
+    fun getCFunction(secret: String, length: Int, functionName: String): String {
         return """
                     |JNIEXPORT jstring JNICALL
                     |Java_$functionName(JNIEnv *env, jobject instance) {
                     |
-                    |return (*env)->  NewStringUTF(env, "$secret");
+                    |$secret
+                    |return (*env)->  NewStringUTF(env, mod(enc, ${length + 1}));
                     |}
                     |
                     |""".trimMargin()
+    }
+
+    private fun toCharArray(input: String): String {
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("char enc[${input.length+1}] = {")
+        for (i in input.indices) {
+            val char = input[i]
+            stringBuilder.append(char.toInt())
+            if (i < input.length - 1) stringBuilder.append(", ")
+        }
+        stringBuilder.append(", '\\0'};")
+        return stringBuilder.toString()
     }
 
     override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
@@ -66,7 +86,7 @@ class CcritProcessor : AbstractProcessor() {
 
             val stringBuilder = StringBuilder()
             stringBuilder.append(header)
-            stringBuilder.append(packageNameCFunc)
+            stringBuilder.append(modifyCFunc)
 
             annotatedFunctionsList.forEach { function ->
                 val packageName = processingEnv.elementUtils.getPackageOf(function).toString()
@@ -77,7 +97,7 @@ class CcritProcessor : AbstractProcessor() {
                     )
                 val secret = function.getAnnotation(NativeSecret::class.java).secret
                 val encodedSecret = encode(secret, processingEnv.options["package"] ?: "package")
-                stringBuilder.append(getCFunction(encodedSecret, functionNameWithPackageAndUnderScores))
+                stringBuilder.append(getCFunction(toCharArray(encodedSecret), secret.length, functionNameWithPackageAndUnderScores))
             }
 
             val outputFilePath =
