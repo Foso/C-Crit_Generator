@@ -43,13 +43,14 @@ android {
 kapt {
     arguments {
         arg("ccrit", "src/main/cpp/keys.c")
+        arg("package", "de.jensklingenberg.ccritdemoproject")
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "de.jensklingenberg:ccrit-generator:1.0.0"
-    kapt "de.jensklingenberg:ccrit-generator:1.0.0"
+    implementation "de.jensklingenberg:ccrit-generator:1.1.0"
+    kapt "de.jensklingenberg:ccrit-generator:1.1.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
