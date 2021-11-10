@@ -15,7 +15,7 @@ apply plugin: 'com.bmuschko.nexus'
 
 group = "de.jensklingenberg"
 archivesBaseName = "ccrit-generator"
-version = "1.1.0"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -29,9 +29,6 @@ install {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile "com.google.auto.service:auto-service:1.0-rc6"
-    kapt "com.google.auto.service:auto-service:1.0-rc6"
 }
 
 
@@ -68,7 +65,7 @@ extraArchive {
     javadoc = true
 }
 nexus {
-    sign = false//true
+    sign = false
     repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
     snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 }

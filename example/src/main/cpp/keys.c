@@ -13,9 +13,9 @@ Java_de_jensklingenberg_User_getSecretString(JNIEnv *env, jobject instance) {
 }
 
 JNIEXPORT jstring JNICALL
-Java_de_jensklingenberg_User_getSecondSecretXXX(JNIEnv *env, jobject instance) {
+Java_de_jensklingenberg_User_getSecondSecret(JNIEnv *env, jobject instance) {
    char enc[14] = {19, 10, 4, 0, 0, 17, 25, 11, 87, 97, 1, 16, 1, '\0'};
-   return (*env)->  NewStringUTF(env, mod(enc, 14, "getSecondSecretXXX"));
+   return (*env)->  NewStringUTF(env, mod(enc, 14, "getSecondSecret"));
 }
 
 JNIEXPORT jstring JNICALL

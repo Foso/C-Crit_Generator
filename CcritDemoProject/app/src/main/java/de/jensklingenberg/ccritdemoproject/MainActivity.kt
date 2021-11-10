@@ -1,9 +1,9 @@
 package de.jensklingenberg.ccritdemoproject
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import de.jensklingenberg.ccrit.NativeSecret
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Example of a call to a native method
-        sample_text.text = stringFromJNI()
+        findViewById<TextView>(R.id.sample_text).text = stringFromJNI()
     }
 
     /**

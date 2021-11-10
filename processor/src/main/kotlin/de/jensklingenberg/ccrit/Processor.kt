@@ -1,16 +1,12 @@
 package de.jensklingenberg.ccrit
 
-import com.google.auto.service.AutoService
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 
-
-@AutoService(Processor::class)
 class CcritProcessor : AbstractProcessor() {
 
     companion object {
@@ -103,7 +99,7 @@ class CcritProcessor : AbstractProcessor() {
         stringBuilder.append("char enc[${input.length + 1}] = {")
         for (i in input.indices) {
             val char = input[i]
-            stringBuilder.append(char.toInt())
+            stringBuilder.append(char.code)
             if (i < input.length - 1) stringBuilder.append(", ")
         }
         stringBuilder.append(", '\\0'};")
@@ -112,7 +108,7 @@ class CcritProcessor : AbstractProcessor() {
 
     private fun encode(text: String, key: String): String {
         val result = java.lang.StringBuilder()
-        for (c in text.indices) result.append((text[c].toInt() xor key[c % key.length].toInt()).toChar())
+        for (c in text.indices) result.append((text[c].code xor key[c % key.length].code).toChar())
         return result.toString()
     }
 }
