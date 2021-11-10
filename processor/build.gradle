@@ -7,7 +7,7 @@ plugins {
 
 }
 
-apply plugin: 'kotlin-kapt'
+
 apply plugin: "maven"
 apply plugin: 'com.bmuschko.nexus'
 
@@ -65,7 +65,7 @@ extraArchive {
     javadoc = true
 }
 nexus {
-    sign = false
+    sign = true
     repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
     snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 }

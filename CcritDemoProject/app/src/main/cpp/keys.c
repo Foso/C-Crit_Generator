@@ -13,8 +13,8 @@ Java_de_jensklingenberg_ccritdemoproject_MainActivity_stringFromJNI(JNIEnv *env,
 }
 
 JNIEXPORT jstring JNICALL
-Java_de_jensklingenberg_ccritdemoproject_MainActivity_secondSecretString(JNIEnv *env, jobject instance) {
-   char enc[11] = {7, 10, 19, 60, 11, 7, 33, 0, 23, 64, '\0'};
-   return (*env)->  NewStringUTF(env, mod(enc, 11, "secondSecretString"));
+Java_de_jensklingenberg_ccritdemoproject_MainActivity_secondSe2cretString(JNIEnv *env, jobject instance) {
+   char enc[11] = {7, 10, 19, 60, 11, 7, 33, 0, 70, 81, '\0'};
+   return (*env)->  NewStringUTF(env, mod(enc, 11, "secondSe2cretString"));
 }
 
