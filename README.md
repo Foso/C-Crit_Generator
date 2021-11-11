@@ -31,14 +31,14 @@ repositories {
 }
 
 dependencies {
-        classpath "de.jensklingenberg:ccrit-generator:1.0.0"
+        classpath "de.jensklingenberg:ccrit-generator:1.2.0"
 }
 ```
 Add the dependency from MavenCentral to your app build.gradle
 ```groovy
 dependencies {
-    implementation "de.jensklingenberg:ccrit-generator:1.0.0"
-    kapt "de.jensklingenberg:ccrit-generator:1.0.0"
+    implementation "de.jensklingenberg:ccrit-generator:1.2.0"
+    kapt "de.jensklingenberg:ccrit-generator:1.2.0"
 }
 ```
 Configure the processor in your build.gradle
